@@ -19,11 +19,15 @@ def load_dataset():
         return x_train, y_train
 
 
+def sigmoid(a):
+    return 1 / (1 + np.exp(-a))
+
+
 images, labels = load_dataset()
 
-weights_input_to_hidden = np.random.uniform(-0.5, 0.5, (20, 784))
-weights_hidden_to_output = np.random.uniform(-0.5, 0.5, (10, 20))
-bias_input_to_hidden = np.zeros((20, 1))
+weights_input_to_hidden = np.random.uniform(-0.5, 0.5, (16, 784))
+weights_hidden_to_output = np.random.uniform(-0.5, 0.5, (10, 16))
+bias_input_to_hidden = np.zeros((16, 1))
 bias_hidden_to_output = np.zeros((10, 1))
 
 epochs = 3
@@ -35,16 +39,16 @@ for epoch in range(epochs):
     print(f"Epoch №{epoch}")
 
     for image, label in zip(images, labels):
-        image = np.reshape(image, (-1, 1))
-        label = np.reshape(label, (-1, 1))
+        image = np.reshape(image, (-1, 1))  # input layer
+        label = np.reshape(label, (-1, 1))  # classes
 
         # Forward propagation (to hidden layer)
-        hidden_raw = bias_input_to_hidden + weights_input_to_hidden @ image
-        hidden = 1 / (1 + np.exp(-hidden_raw))  # sigmoid
+        hidden_raw = bias_input_to_hidden + weights_input_to_hidden @ image  # W * a + b
+        hidden = sigmoid(hidden_raw)  # sigmoid(W * a + b)
 
         # Forward propagation (to output layer)
-        output_raw = bias_hidden_to_output + weights_hidden_to_output @ hidden
-        output = 1 / (1 + np.exp(-output_raw))
+        output_raw = bias_hidden_to_output + weights_hidden_to_output @ hidden  # W * a + b
+        output = sigmoid(output_raw)  # sigmoid(W * a + b)
 
         # Loss / Error calculation
         e_loss += 1 / len(output) * np.sum((output - label) ** 2, axis=0)
@@ -83,10 +87,10 @@ image = np.reshape(test_image, (-1, 1))
 
 # Forward propagation (to hidden layer)
 hidden_raw = bias_input_to_hidden + weights_input_to_hidden @ image
-hidden = 1 / (1 + np.exp(-hidden_raw))  # sigmoid
+hidden = sigmoid(hidden_raw)  # sigmoid
 # Forward propagation (to output layer)
 output_raw = bias_hidden_to_output + weights_hidden_to_output @ hidden
-output = 1 / (1 + np.exp(-output_raw))
+output = sigmoid(output_raw)
 
 plt.imshow(test_image.reshape(28, 28), cmap="Greys")
 plt.title(f"NN suggests the CUSTOM number is: {output.argmax()}")
